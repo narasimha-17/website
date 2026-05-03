@@ -1,0 +1,1264 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Narasimha · AI/ML Engineer</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Syne:wght@400;600;700;800&family=DM+Mono:ital,wght@0,300;0,400;1,300&display=swap" rel="stylesheet" />
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+tailwind.config = {
+  theme: {
+    extend: {
+      fontFamily: {
+        display: ['Syne', 'sans-serif'],
+        mono: ['Space Mono', 'monospace'],
+        code: ['DM Mono', 'monospace'],
+      },
+      colors: {
+        void: '#030712',
+        neural: '#0f1729',
+        signal: '#00f5d4',
+        pulse: '#7b61ff',
+        ember: '#ff6b35',
+        data: '#a8b2d8',
+      },
+      animation: {
+        'float': 'float 6s ease-in-out infinite',
+        'scan': 'scan 3s linear infinite',
+        'blink': 'blink 1.2s step-end infinite',
+        'orbit': 'orbit 12s linear infinite',
+        'orbit-reverse': 'orbit 18s linear infinite reverse',
+        'data-flow': 'dataflow 8s linear infinite',
+      }
+    }
+  }
+}
+</script>
+<style>
+  :root {
+    --void: #030712;
+    --neural: #0f1729;
+    --signal: #00f5d4;
+    --pulse: #7b61ff;
+    --ember: #ff6b35;
+    --data: #a8b2d8;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  
+  html { scroll-behavior: smooth; }
+  
+  body {
+    background: var(--void);
+    color: var(--data);
+    font-family: 'Space Mono', monospace;
+    overflow-x: hidden;
+    cursor: none;
+  }
+
+  /* Custom cursor */
+  #cursor {
+    width: 12px; height: 12px;
+    background: var(--signal);
+    border-radius: 50%;
+    position: fixed;
+    top: 0; left: 0;
+    pointer-events: none;
+    z-index: 9999;
+    transition: transform 0.15s ease, opacity 0.15s ease;
+    mix-blend-mode: screen;
+  }
+  #cursor-ring {
+    width: 36px; height: 36px;
+    border: 1px solid rgba(0,245,212,0.4);
+    border-radius: 50%;
+    position: fixed;
+    top: 0; left: 0;
+    pointer-events: none;
+    z-index: 9998;
+    transition: width 0.3s, height 0.3s, border-color 0.3s;
+    transform: translate(-50%,-50%);
+  }
+  body:hover #cursor { opacity: 1; }
+  a:hover ~ #cursor, button:hover ~ #cursor { transform: scale(2.5); }
+
+  /* Noise grain */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 9997;
+    opacity: 0.4;
+  }
+
+  /* Grid background */
+  .grid-bg {
+    background-image:
+      linear-gradient(rgba(0,245,212,0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0,245,212,0.03) 1px, transparent 1px);
+    background-size: 60px 60px;
+  }
+
+  /* Glitch text */
+  .glitch {
+    position: relative;
+  }
+  .glitch::before, .glitch::after {
+    content: attr(data-text);
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+  }
+  .glitch::before {
+    color: var(--pulse);
+    animation: glitch1 4s infinite;
+    clip-path: polygon(0 30%, 100% 30%, 100% 50%, 0 50%);
+  }
+  .glitch::after {
+    color: var(--ember);
+    animation: glitch2 4s infinite;
+    clip-path: polygon(0 60%, 100% 60%, 100% 80%, 0 80%);
+  }
+
+  @keyframes glitch1 {
+    0%, 90%, 100% { transform: translate(0); opacity: 0; }
+    92% { transform: translate(-4px, 2px); opacity: 0.8; }
+    94% { transform: translate(3px, -1px); opacity: 0.8; }
+    96% { transform: translate(-2px, 0); opacity: 0.8; }
+  }
+  @keyframes glitch2 {
+    0%, 88%, 100% { transform: translate(0); opacity: 0; }
+    90% { transform: translate(4px, -2px); opacity: 0.7; }
+    92% { transform: translate(-3px, 1px); opacity: 0.7; }
+  }
+
+  @keyframes float {
+    0%, 100% { transform: translateY(0px); }
+    50% { transform: translateY(-20px); }
+  }
+  @keyframes scan {
+    0% { transform: translateY(-100%); }
+    100% { transform: translateY(100vh); }
+  }
+  @keyframes blink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0; }
+  }
+  @keyframes orbit {
+    0% { transform: rotate(0deg) translateX(120px) rotate(0deg); }
+    100% { transform: rotate(360deg) translateX(120px) rotate(-360deg); }
+  }
+  @keyframes dataflow {
+    0% { stroke-dashoffset: 1000; }
+    100% { stroke-dashoffset: 0; }
+  }
+  @keyframes pulse-ring {
+    0% { transform: scale(1); opacity: 0.6; }
+    100% { transform: scale(2.5); opacity: 0; }
+  }
+  @keyframes shimmer {
+    0% { background-position: -200% center; }
+    100% { background-position: 200% center; }
+  }
+  @keyframes typewriter {
+    from { width: 0; }
+    to { width: 100%; }
+  }
+  @keyframes fadeSlideUp {
+    from { opacity: 0; transform: translateY(40px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes countUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* Scan line */
+  .scanline {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 2px;
+    background: linear-gradient(90deg, transparent, var(--signal), transparent);
+    animation: scan 6s linear infinite;
+    opacity: 0.15;
+    pointer-events: none;
+    z-index: 9996;
+  }
+
+  /* Neural network canvas */
+  #neural-canvas {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+  }
+
+  /* Glow effects */
+  .glow-signal { box-shadow: 0 0 20px rgba(0,245,212,0.3), 0 0 60px rgba(0,245,212,0.1); }
+  .glow-pulse { box-shadow: 0 0 20px rgba(123,97,255,0.3), 0 0 60px rgba(123,97,255,0.1); }
+  .text-glow-signal { text-shadow: 0 0 20px rgba(0,245,212,0.6); }
+  .text-glow-pulse { text-shadow: 0 0 20px rgba(123,97,255,0.6); }
+
+  /* Card glass */
+  .glass {
+    background: rgba(15,23,41,0.6);
+    backdrop-filter: blur(16px);
+    border: 1px solid rgba(0,245,212,0.08);
+    transition: border-color 0.3s, box-shadow 0.3s, transform 0.3s;
+  }
+  .glass:hover {
+    border-color: rgba(0,245,212,0.25);
+    box-shadow: 0 0 40px rgba(0,245,212,0.08), 0 20px 60px rgba(0,0,0,0.4);
+    transform: translateY(-4px);
+  }
+
+  /* Skill bar */
+  .skill-bar-fill {
+    height: 2px;
+    background: linear-gradient(90deg, var(--signal), var(--pulse));
+    transform-origin: left;
+    transform: scaleX(0);
+    transition: transform 1s cubic-bezier(0.16, 1, 0.3, 1);
+    box-shadow: 0 0 8px var(--signal);
+  }
+
+  /* Tag chip */
+  .tag {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.65rem;
+    padding: 3px 10px;
+    border-radius: 100px;
+    border: 1px solid;
+    letter-spacing: 0.05em;
+    transition: all 0.2s;
+  }
+  .tag-signal { border-color: rgba(0,245,212,0.3); color: var(--signal); background: rgba(0,245,212,0.05); }
+  .tag-pulse { border-color: rgba(123,97,255,0.3); color: #b8a9ff; background: rgba(123,97,255,0.05); }
+  .tag-ember { border-color: rgba(255,107,53,0.3); color: #ff9c78; background: rgba(255,107,53,0.05); }
+  .tag:hover { transform: scale(1.05); }
+
+  /* Nav */
+  nav {
+    position: fixed; top: 0; left: 0; right: 0;
+    z-index: 1000;
+    padding: 1.25rem 2rem;
+    background: rgba(3,7,18,0.8);
+    backdrop-filter: blur(20px);
+    border-bottom: 1px solid rgba(0,245,212,0.05);
+    transition: all 0.3s;
+  }
+
+  /* Section reveal */
+  .reveal {
+    opacity: 0;
+    transform: translateY(50px);
+    transition: opacity 0.8s cubic-bezier(0.16,1,0.3,1), transform 0.8s cubic-bezier(0.16,1,0.3,1);
+  }
+  .reveal.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  /* Terminal */
+  .terminal {
+    background: rgba(3,7,18,0.9);
+    border: 1px solid rgba(0,245,212,0.15);
+    border-radius: 8px;
+    overflow: hidden;
+  }
+  .terminal-bar {
+    background: rgba(0,245,212,0.05);
+    padding: 8px 16px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    border-bottom: 1px solid rgba(0,245,212,0.08);
+  }
+  .dot { width: 10px; height: 10px; border-radius: 50%; }
+
+  /* Orbit animation */
+  .orbit-container {
+    position: relative;
+    width: 280px; height: 280px;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .orbit-ring {
+    position: absolute;
+    border-radius: 50%;
+    border: 1px dashed rgba(0,245,212,0.15);
+  }
+  .orbit-dot {
+    position: absolute;
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: var(--signal);
+    box-shadow: 0 0 12px var(--signal);
+  }
+
+  /* Progress ring */
+  .progress-ring circle {
+    transition: stroke-dashoffset 1.5s cubic-bezier(0.16,1,0.3,1);
+  }
+
+  /* Scrollbar */
+  ::-webkit-scrollbar { width: 4px; }
+  ::-webkit-scrollbar-track { background: var(--void); }
+  ::-webkit-scrollbar-thumb { background: rgba(0,245,212,0.3); border-radius: 2px; }
+
+  /* Shimmer gradient text */
+  .shimmer-text {
+    background: linear-gradient(90deg, var(--signal) 0%, var(--pulse) 30%, var(--ember) 50%, var(--pulse) 70%, var(--signal) 100%);
+    background-size: 200% auto;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    animation: shimmer 4s linear infinite;
+  }
+
+  /* Pulse animation */
+  .pulse-dot::after {
+    content: '';
+    position: absolute;
+    inset: -4px;
+    border-radius: 50%;
+    border: 1px solid var(--signal);
+    animation: pulse-ring 1.5s cubic-bezier(0, 0, 0.2, 1) infinite;
+  }
+
+  /* Mobile */
+  @media (max-width: 768px) {
+    .glitch::before, .glitch::after { display: none; }
+  }
+</style>
+</head>
+<body class="grid-bg">
+
+<!-- Cursor -->
+<div id="cursor"></div>
+<div id="cursor-ring"></div>
+
+<!-- Scan line -->
+<div class="scanline"></div>
+
+<!-- Neural canvas background -->
+<canvas id="neural-canvas" style="position:fixed;inset:0;z-index:0;pointer-events:none;"></canvas>
+
+<!-- ─── NAV ─── -->
+<nav>
+  <div class="max-w-6xl mx-auto flex items-center justify-between">
+    <div class="font-display font-800 text-sm tracking-widest uppercase">
+      <span class="text-signal text-glow-signal">N</span><span class="text-white">TS</span>
+      <span class="text-data text-xs ml-2 font-code opacity-50">// v2.0</span>
+    </div>
+    <div class="hidden md:flex items-center gap-8 font-code text-xs tracking-wider uppercase">
+      <a href="#about" class="text-data hover:text-signal transition-colors">About</a>
+      <a href="#projects" class="text-data hover:text-signal transition-colors">Projects</a>
+      <a href="#skills" class="text-data hover:text-signal transition-colors">Skills</a>
+      <a href="#research" class="text-data hover:text-signal transition-colors">Research</a>
+      <a href="#contact" class="text-data hover:text-signal transition-colors">Contact</a>
+    </div>
+    <a href="mailto:narasimha@srmist.edu.in" class="font-code text-xs px-4 py-2 border border-signal text-signal glow-signal rounded transition-all hover:bg-signal hover:text-void">
+      → Hire Me
+    </a>
+  </div>
+</nav>
+
+<!-- ─── HERO ─── -->
+<section class="relative min-h-screen flex items-center justify-center overflow-hidden" id="hero">
+  <!-- Floating orbs -->
+  <div class="absolute top-1/4 left-1/4 w-64 h-64 rounded-full" style="background:radial-gradient(circle,rgba(123,97,255,0.12) 0%,transparent 70%); filter:blur(40px); animation:float 8s ease-in-out infinite;"></div>
+  <div class="absolute bottom-1/3 right-1/4 w-96 h-96 rounded-full" style="background:radial-gradient(circle,rgba(0,245,212,0.08) 0%,transparent 70%); filter:blur(60px); animation:float 10s ease-in-out infinite reverse;"></div>
+  <div class="absolute top-1/2 right-1/3 w-48 h-48 rounded-full" style="background:radial-gradient(circle,rgba(255,107,53,0.08) 0%,transparent 70%); filter:blur(30px); animation:float 7s ease-in-out infinite 2s;"></div>
+
+  <div class="relative z-10 max-w-6xl mx-auto px-6 pt-24 grid lg:grid-cols-2 gap-16 items-center">
+    
+    <!-- Left: text -->
+    <div>
+      <!-- Status badge -->
+      <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-signal/20 bg-signal/5 mb-8" style="animation: fadeSlideUp 0.6s ease both;">
+        <span class="relative flex h-2 w-2">
+          <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-signal opacity-75"></span>
+          <span class="relative inline-flex rounded-full h-2 w-2 bg-signal"></span>
+        </span>
+        <span class="font-code text-xs text-signal tracking-widest uppercase">Available for Internships</span>
+      </div>
+
+      <!-- Name -->
+      <div style="animation: fadeSlideUp 0.8s ease 0.1s both;">
+        <div class="font-code text-xs text-data/50 tracking-[0.3em] uppercase mb-2">
+          <span class="text-signal">//</span> AI/ML Engineer & Full-Stack Developer
+        </div>
+        <h1 class="font-display font-800 leading-none text-white mb-4">
+          <span style="font-size:clamp(2.5rem,6vw,5rem);">Budde</span><br/>
+          <span class="glitch shimmer-text" data-text="Narasimha" style="font-size:clamp(2.5rem,6vw,5rem);">Narasimha</span><br/>
+          <span style="font-size:clamp(1.5rem,3.5vw,2.8rem); color:var(--data); opacity:0.6;">Surya Teja</span>
+        </h1>
+      </div>
+
+      <!-- Tagline terminal -->
+      <div class="terminal mt-6 mb-8" style="animation: fadeSlideUp 0.8s ease 0.2s both;">
+        <div class="terminal-bar">
+          <div class="dot bg-red-500"></div>
+          <div class="dot bg-yellow-500"></div>
+          <div class="dot bg-green-500"></div>
+          <span class="font-code text-xs text-data/40 ml-2">narasimha@srmist ~ bash</span>
+        </div>
+        <div class="p-4 font-code text-xs leading-relaxed">
+          <div class="text-signal/60 mb-1">$ whoami</div>
+          <div class="text-white mb-3 typing-text" id="typed-text">B.Tech CSE (AI&ML) @ SRMIST · Graduating 2027</div>
+          <div class="text-signal/60 mb-1">$ cat skills.txt</div>
+          <div class="text-data/80 mb-3">RAG · LLMs · PyTorch · FastAPI · React · AWS · LangChain</div>
+          <div class="text-signal/60">$ _<span style="animation:blink 1s step-end infinite;">|</span></div>
+        </div>
+      </div>
+
+      <!-- CTAs -->
+      <div class="flex flex-wrap gap-4" style="animation: fadeSlideUp 0.8s ease 0.3s both;">
+        <a href="#projects" class="inline-flex items-center gap-2 px-6 py-3 bg-signal text-void font-display font-700 text-sm rounded transition-all hover:bg-signal/90 hover:scale-105" style="box-shadow:0 0 30px rgba(0,245,212,0.3);">
+          <span>View Projects</span>
+          <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+        </a>
+        <a href="#research" class="inline-flex items-center gap-2 px-6 py-3 border border-pulse/40 text-pulse font-display font-600 text-sm rounded transition-all hover:bg-pulse/10 hover:border-pulse hover:scale-105">
+          <span>Research Papers</span>
+        </a>
+      </div>
+
+      <!-- Stats -->
+      <div class="flex gap-8 mt-10" style="animation: fadeSlideUp 0.8s ease 0.4s both;">
+        <div>
+          <div class="font-display font-800 text-2xl text-white counter" data-target="5">0</div>
+          <div class="font-code text-xs text-data/50 mt-1">AI Projects</div>
+        </div>
+        <div class="w-px bg-data/10"></div>
+        <div>
+          <div class="font-display font-800 text-2xl text-white counter" data-target="2">0</div>
+          <div class="font-code text-xs text-data/50 mt-1">Research Papers</div>
+        </div>
+        <div class="w-px bg-data/10"></div>
+        <div>
+          <div class="font-display font-800 text-2xl text-white counter" data-target="3">0</div>
+          <div class="font-code text-xs text-data/50 mt-1">rd · IIT Madras</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right: orbit visualization -->
+    <div class="hidden lg:flex items-center justify-center" style="animation: fadeSlideUp 0.8s ease 0.2s both;">
+      <div class="orbit-container" style="width:360px;height:360px;">
+        <!-- Rings -->
+        <div class="orbit-ring" style="width:340px;height:340px;"></div>
+        <div class="orbit-ring" style="width:250px;height:250px;border-color:rgba(123,97,255,0.12);"></div>
+        <div class="orbit-ring" style="width:160px;height:160px;border-color:rgba(255,107,53,0.12);"></div>
+
+        <!-- Center -->
+        <div class="relative z-10 w-24 h-24 rounded-full flex items-center justify-center" style="background:linear-gradient(135deg,rgba(0,245,212,0.15),rgba(123,97,255,0.15));border:1px solid rgba(0,245,212,0.3);box-shadow:0 0 40px rgba(0,245,212,0.2);">
+          <svg width="40" height="40" viewBox="0 0 24 24" fill="none">
+            <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" stroke="url(#grad1)" stroke-width="1.5" stroke-linecap="round"/>
+            <defs><linearGradient id="grad1" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#00f5d4"/><stop offset="100%" stop-color="#7b61ff"/></linearGradient></defs>
+          </svg>
+        </div>
+
+        <!-- Orbiting tech dots -->
+        <div class="orbit-item" style="position:absolute;width:100%;height:100%;animation:orbit 8s linear infinite;">
+          <div style="position:absolute;top:-16px;left:50%;transform:translateX(-50%);width:32px;height:32px;border-radius:6px;background:rgba(15,23,41,0.9);border:1px solid rgba(0,245,212,0.3);display:flex;align-items:center;justify-content:center;font-family:'DM Mono',monospace;font-size:0.55rem;color:var(--signal);white-space:nowrap;">PyTorch</div>
+        </div>
+        <div style="position:absolute;width:100%;height:100%;animation:orbit 8s linear infinite 2s;">
+          <div style="position:absolute;top:-16px;left:50%;transform:translateX(-50%);width:32px;height:32px;border-radius:6px;background:rgba(15,23,41,0.9);border:1px solid rgba(123,97,255,0.3);display:flex;align-items:center;justify-content:center;font-family:'DM Mono',monospace;font-size:0.55rem;color:#b8a9ff;white-space:nowrap;">FastAPI</div>
+        </div>
+        <div style="position:absolute;width:100%;height:100%;animation:orbit 8s linear infinite 4s;">
+          <div style="position:absolute;top:-16px;left:50%;transform:translateX(-50%);width:32px;height:32px;border-radius:6px;background:rgba(15,23,41,0.9);border:1px solid rgba(255,107,53,0.3);display:flex;align-items:center;justify-content:center;font-family:'DM Mono',monospace;font-size:0.55rem;color:#ff9c78;white-space:nowrap;">FAISS</div>
+        </div>
+        <div style="position:absolute;width:75%;height:75%;top:12.5%;left:12.5%;animation:orbit 12s linear infinite reverse;">
+          <div style="position:absolute;top:-14px;left:50%;transform:translateX(-50%);width:28px;height:28px;border-radius:6px;background:rgba(15,23,41,0.9);border:1px solid rgba(0,245,212,0.2);display:flex;align-items:center;justify-content:center;font-family:'DM Mono',monospace;font-size:0.5rem;color:var(--signal);white-space:nowrap;">RAG</div>
+        </div>
+        <div style="position:absolute;width:75%;height:75%;top:12.5%;left:12.5%;animation:orbit 12s linear infinite reverse 4s;">
+          <div style="position:absolute;top:-14px;left:50%;transform:translateX(-50%);width:28px;height:28px;border-radius:6px;background:rgba(15,23,41,0.9);border:1px solid rgba(123,97,255,0.2);display:flex;align-items:center;justify-content:center;font-family:'DM Mono',monospace;font-size:0.5rem;color:#b8a9ff;white-space:nowrap;">LLM</div>
+        </div>
+        <div style="position:absolute;width:50%;height:50%;top:25%;left:25%;animation:orbit 6s linear infinite 1s;">
+          <div style="position:absolute;top:-12px;left:50%;transform:translateX(-50%);width:24px;height:24px;border-radius:6px;background:rgba(15,23,41,0.9);border:1px solid rgba(255,107,53,0.2);display:flex;align-items:center;justify-content:center;font-family:'DM Mono',monospace;font-size:0.45rem;color:#ff9c78;white-space:nowrap;">AWS</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Scroll indicator -->
+  <div class="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2">
+    <span class="font-code text-xs text-data/30 tracking-widest uppercase">Scroll</span>
+    <div class="w-px h-12 bg-gradient-to-b from-signal/40 to-transparent relative overflow-hidden">
+      <div style="position:absolute;top:0;left:0;width:100%;height:100%;background:linear-gradient(to bottom,transparent,var(--signal),transparent);animation:scan 1.5s linear infinite;"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ─── ABOUT ─── -->
+<section id="about" class="py-32 px-6 relative">
+  <div class="max-w-6xl mx-auto">
+    <div class="reveal grid lg:grid-cols-2 gap-16 items-center">
+      
+      <div>
+        <div class="font-code text-xs text-signal tracking-widest uppercase mb-3">// 001 · About</div>
+        <h2 class="font-display font-800 text-4xl md:text-5xl text-white leading-tight mb-6">
+          Engineering<br/><span class="shimmer-text">Intelligence</span><br/>into Systems
+        </h2>
+        <p class="font-code text-sm text-data/70 leading-relaxed mb-6">
+          B.Tech CS (AI&ML) student at SRMIST, building production-grade AI systems with a focus on RAG pipelines, LLM APIs, and scalable ML architectures. Former intern at <span class="text-signal">Infosys Springboard</span> (Full-Stack) and <span class="text-pulse" style="color:#b8a9ff;">Cognifyz Technologies</span> (ML Engineering).
+        </p>
+        <p class="font-code text-sm text-data/70 leading-relaxed mb-8">
+          Beyond code — co-authoring research on hybrid deep learning architectures for medical imaging and remote sensing. Led student affairs as Committee Head at SRMIST. Won <span class="text-ember" style="color:#ff9c78;">3rd place</span> at E-Cell IIT Madras National Innovation Challenge.
+        </p>
+
+        <!-- Timeline -->
+        <div class="space-y-4">
+          <div class="flex gap-4 items-start">
+            <div class="flex flex-col items-center">
+              <div class="w-2 h-2 rounded-full bg-signal mt-1.5 flex-shrink-0" style="box-shadow:0 0 8px var(--signal);"></div>
+              <div class="w-px flex-1 bg-signal/20 mt-2"></div>
+            </div>
+            <div>
+              <div class="font-code text-xs text-signal mb-0.5">2023 – Present</div>
+              <div class="font-display font-700 text-white text-sm">SRMIST · B.Tech CSE AI/ML</div>
+              <div class="font-code text-xs text-data/50">Kattankulatham, Chennai · CGPA 8.7+</div>
+            </div>
+          </div>
+          <div class="flex gap-4 items-start">
+            <div class="flex flex-col items-center">
+              <div class="w-2 h-2 rounded-full" style="background:var(--pulse);margin-top:6px;flex-shrink:0;box-shadow:0 0 8px var(--pulse);"></div>
+              <div class="w-px flex-1 mt-2" style="background:rgba(123,97,255,0.2);"></div>
+            </div>
+            <div>
+              <div class="font-code text-xs mb-0.5" style="color:var(--pulse);">2024</div>
+              <div class="font-display font-700 text-white text-sm">ML Engineer Intern · Cognifyz Technologies</div>
+              <div class="font-code text-xs text-data/50">NLP pipelines · model evaluation</div>
+            </div>
+          </div>
+          <div class="flex gap-4 items-start">
+            <div class="flex flex-col items-center">
+              <div class="w-2 h-2 rounded-full flex-shrink-0" style="background:var(--ember);margin-top:6px;box-shadow:0 0 8px var(--ember);"></div>
+            </div>
+            <div>
+              <div class="font-code text-xs text-data/60 mb-0.5" style="color:var(--ember);">2024</div>
+              <div class="font-display font-700 text-white text-sm">Full-Stack Dev Intern · Infosys Springboard</div>
+              <div class="font-code text-xs text-data/50">React · Node · REST APIs</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Cert / AWS card -->
+      <div class="flex flex-col gap-4">
+        <!-- AWS cert card -->
+        <div class="glass rounded-2xl p-6" style="border-color:rgba(255,107,53,0.15);">
+          <div class="flex items-start gap-4">
+            <div class="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0" style="background:linear-gradient(135deg,rgba(255,107,53,0.2),rgba(255,107,53,0.05));border:1px solid rgba(255,107,53,0.3);">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M3 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z" stroke="#ff9c78" stroke-width="1.5"/><line x1="3" y1="21" x2="3" y2="15" stroke="#ff9c78" stroke-width="1.5" stroke-linecap="round"/></svg>
+            </div>
+            <div>
+              <div class="font-display font-700 text-white mb-1">AWS Certified</div>
+              <div class="font-code text-xs text-data/60">Cloud Practitioner · Amazon Web Services</div>
+              <div class="font-code text-xs mt-2" style="color:#ff9c78;">✓ Verified Credential</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- IIT Madras card -->
+        <div class="glass rounded-2xl p-6" style="border-color:rgba(123,97,255,0.15);">
+          <div class="flex items-start gap-4">
+            <div class="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0" style="background:linear-gradient(135deg,rgba(123,97,255,0.2),rgba(123,97,255,0.05));border:1px solid rgba(123,97,255,0.3);">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><polygon points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26" stroke="#b8a9ff" stroke-width="1.5"/></svg>
+            </div>
+            <div>
+              <div class="font-display font-700 text-white mb-1">🥉 3rd Place — IIT Madras</div>
+              <div class="font-code text-xs text-data/60">E-Cell National Innovation Challenge</div>
+              <div class="font-code text-xs mt-2" style="color:#b8a9ff;">Innovation · Entrepreneurship</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Committee head -->
+        <div class="glass rounded-2xl p-6" style="border-color:rgba(0,245,212,0.15);">
+          <div class="flex items-start gap-4">
+            <div class="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0" style="background:linear-gradient(135deg,rgba(0,245,212,0.15),rgba(0,245,212,0.03));border:1px solid rgba(0,245,212,0.3);">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" stroke="#00f5d4" stroke-width="1.5"/><circle cx="9" cy="7" r="4" stroke="#00f5d4" stroke-width="1.5"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75" stroke="#00f5d4" stroke-width="1.5"/></svg>
+            </div>
+            <div>
+              <div class="font-display font-700 text-white mb-1">Committee Head</div>
+              <div class="font-code text-xs text-data/60">SRMIST Directorate of Student Affairs</div>
+              <div class="font-code text-xs mt-2 text-signal">Leadership · Community</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ─── PROJECTS ─── -->
+<section id="projects" class="py-32 px-6 relative">
+  <div class="absolute inset-0" style="background:linear-gradient(180deg,transparent,rgba(0,245,212,0.02),transparent);pointer-events:none;"></div>
+  <div class="max-w-6xl mx-auto">
+    <div class="reveal text-center mb-16">
+      <div class="font-code text-xs text-signal tracking-widest uppercase mb-3">// 002 · Projects</div>
+      <h2 class="font-display font-800 text-4xl md:text-5xl text-white">
+        What I've <span class="shimmer-text">Built</span>
+      </h2>
+    </div>
+
+    <div class="reveal grid md:grid-cols-2 gap-6">
+      
+      <!-- CertiRAG -->
+      <div class="glass rounded-2xl p-6 group" style="border-color:rgba(0,245,212,0.1);">
+        <div class="flex items-center justify-between mb-5">
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-lg flex items-center justify-content:center" style="background:rgba(0,245,212,0.1);border:1px solid rgba(0,245,212,0.2);display:flex;align-items:center;justify-content:center;">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><rect x="3" y="3" width="18" height="18" rx="2" stroke="#00f5d4" stroke-width="1.5"/><circle cx="12" cy="12" r="3" stroke="#00f5d4" stroke-width="1.5"/><path d="M3 9h2m14 0h2M3 15h2m14 0h2M9 3v2m0 14v2M15 3v2m0 14v2" stroke="#00f5d4" stroke-width="1.5"/></svg>
+            </div>
+            <div>
+              <h3 class="font-display font-700 text-white text-sm">CertiRAG</h3>
+              <div class="font-code text-xs text-data/40">AI · RAG · Vector DB</div>
+            </div>
+          </div>
+          <a href="#" class="opacity-0 group-hover:opacity-100 transition-opacity">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-signal"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6M15 3h6v6M10 14L21 3"/></svg>
+          </a>
+        </div>
+        <p class="font-code text-xs text-data/60 leading-relaxed mb-5">
+          RAG pipeline using FAISS vector indexing for intelligent certificate Q&A. Processes unstructured document data with semantic search and LLM-powered responses.
+        </p>
+        <div class="flex flex-wrap gap-2">
+          <span class="tag tag-signal">RAG</span>
+          <span class="tag tag-signal">FAISS</span>
+          <span class="tag tag-pulse">LangChain</span>
+          <span class="tag tag-pulse">FastAPI</span>
+          <span class="tag tag-ember">Vector DB</span>
+        </div>
+        <!-- Progress bar -->
+        <div class="mt-5">
+          <div class="flex justify-between items-center mb-1.5">
+            <span class="font-code text-xs text-data/40">Complexity</span>
+            <span class="font-code text-xs text-signal">Advanced</span>
+          </div>
+          <div class="h-px bg-data/10 rounded overflow-hidden">
+            <div class="skill-bar-fill" style="width:88%;transform:scaleX(0.88);"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- FinRAG -->
+      <div class="glass rounded-2xl p-6 group" style="border-color:rgba(123,97,255,0.1);">
+        <div class="flex items-center justify-between mb-5">
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-lg flex items-center justify-content:center" style="background:rgba(123,97,255,0.1);border:1px solid rgba(123,97,255,0.2);display:flex;align-items:center;justify-content:center;">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M12 1v22M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" stroke="#b8a9ff" stroke-width="1.5" stroke-linecap="round"/></svg>
+            </div>
+            <div>
+              <h3 class="font-display font-700 text-white text-sm">FinRAG</h3>
+              <div class="font-code text-xs text-data/40">Finance · LLM · Q&A</div>
+            </div>
+          </div>
+          <a href="#" class="opacity-0 group-hover:opacity-100 transition-opacity">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:#b8a9ff;"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6M15 3h6v6M10 14L21 3"/></svg>
+          </a>
+        </div>
+        <p class="font-code text-xs text-data/60 leading-relaxed mb-5">
+          Financial document Q&A system using LangChain, RAG, and FastAPI. Enables semantic retrieval over complex financial reports with conversational AI interface.
+        </p>
+        <div class="flex flex-wrap gap-2">
+          <span class="tag tag-pulse">LangChain</span>
+          <span class="tag tag-pulse">FastAPI</span>
+          <span class="tag tag-signal">RAG</span>
+          <span class="tag tag-ember">OpenAI API</span>
+        </div>
+        <div class="mt-5">
+          <div class="flex justify-between items-center mb-1.5">
+            <span class="font-code text-xs text-data/40">Complexity</span>
+            <span class="font-code text-xs" style="color:#b8a9ff;">Advanced</span>
+          </div>
+          <div class="h-px bg-data/10 rounded overflow-hidden">
+            <div class="skill-bar-fill" style="width:85%;transform:scaleX(0.85);background:linear-gradient(90deg,#7b61ff,#b8a9ff);"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- AgroCare -->
+      <div class="glass rounded-2xl p-6 group" style="border-color:rgba(255,107,53,0.1);">
+        <div class="flex items-center justify-between mb-5">
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-lg" style="background:rgba(255,107,53,0.1);border:1px solid rgba(255,107,53,0.2);display:flex;align-items:center;justify-content:center;">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M2 22a10 10 0 0 1 10-10" stroke="#ff9c78" stroke-width="1.5"/><path d="M12 12c0-5.523 4.477-10 10-10" stroke="#ff9c78" stroke-width="1.5"/><path d="M12 22V12" stroke="#ff9c78" stroke-width="1.5"/></svg>
+            </div>
+            <div>
+              <h3 class="font-display font-700 text-white text-sm">AgroCare</h3>
+              <div class="font-code text-xs text-data/40">AgriTech · Computer Vision</div>
+            </div>
+          </div>
+          <a href="#" class="opacity-0 group-hover:opacity-100 transition-opacity">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:#ff9c78;"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6M15 3h6v6M10 14L21 3"/></svg>
+          </a>
+        </div>
+        <p class="font-code text-xs text-data/60 leading-relaxed mb-5">
+          Agricultural AI platform leveraging computer vision for crop disease detection. Combines CNN-based image classification with real-time analysis for farmers.
+        </p>
+        <div class="flex flex-wrap gap-2">
+          <span class="tag tag-ember">PyTorch</span>
+          <span class="tag tag-ember">CNN</span>
+          <span class="tag tag-signal">FastAPI</span>
+          <span class="tag tag-pulse">React</span>
+        </div>
+        <div class="mt-5">
+          <div class="flex justify-between items-center mb-1.5">
+            <span class="font-code text-xs text-data/40">Complexity</span>
+            <span class="font-code text-xs" style="color:#ff9c78;">Intermediate+</span>
+          </div>
+          <div class="h-px bg-data/10 rounded overflow-hidden">
+            <div class="skill-bar-fill" style="width:75%;transform:scaleX(0.75);background:linear-gradient(90deg,#ff6b35,#ff9c78);"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- NeuroTumorNet -->
+      <div class="glass rounded-2xl p-6 group" style="border-color:rgba(0,245,212,0.08);">
+        <div class="flex items-center justify-between mb-5">
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-lg" style="background:rgba(0,245,212,0.08);border:1px solid rgba(0,245,212,0.15);display:flex;align-items:center;justify-content:center;">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="3" stroke="#00f5d4" stroke-width="1.5"/><path d="M12 1v3M12 20v3M4.22 4.22l2.12 2.12M17.66 17.66l2.12 2.12M1 12h3M20 12h3M4.22 19.78l2.12-2.12M17.66 6.34l2.12-2.12" stroke="#00f5d4" stroke-width="1.5"/></svg>
+            </div>
+            <div>
+              <h3 class="font-display font-700 text-white text-sm">NeuroTumorNet</h3>
+              <div class="font-code text-xs text-data/40">Medical AI · Deep Learning</div>
+            </div>
+          </div>
+        </div>
+        <p class="font-code text-xs text-data/60 leading-relaxed mb-5">
+          Deep learning model for brain tumor classification using MRI scans. Built with transfer learning and fine-tuned CNN architectures for high diagnostic accuracy.
+        </p>
+        <div class="flex flex-wrap gap-2">
+          <span class="tag tag-signal">PyTorch</span>
+          <span class="tag tag-signal">CNN</span>
+          <span class="tag tag-pulse">Transfer Learning</span>
+          <span class="tag tag-ember">Medical AI</span>
+        </div>
+        <div class="mt-5">
+          <div class="flex justify-between items-center mb-1.5">
+            <span class="font-code text-xs text-data/40">Complexity</span>
+            <span class="font-code text-xs text-signal">Research-grade</span>
+          </div>
+          <div class="h-px bg-data/10 rounded overflow-hidden">
+            <div class="skill-bar-fill" style="width:92%;transform:scaleX(0.92);"></div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ─── SKILLS ─── -->
+<section id="skills" class="py-32 px-6">
+  <div class="max-w-6xl mx-auto">
+    <div class="reveal text-center mb-16">
+      <div class="font-code text-xs text-signal tracking-widest uppercase mb-3">// 003 · Skills</div>
+      <h2 class="font-display font-800 text-4xl md:text-5xl text-white">
+        Tech <span class="shimmer-text">Stack</span>
+      </h2>
+    </div>
+
+    <div class="reveal grid md:grid-cols-3 gap-6">
+      <!-- AI/ML -->
+      <div class="glass rounded-2xl p-6" style="border-color:rgba(0,245,212,0.12);">
+        <div class="font-code text-xs text-signal tracking-widest uppercase mb-6">AI / ML</div>
+        <div class="space-y-4">
+          <div class="skill-item" data-level="95">
+            <div class="flex justify-between mb-2">
+              <span class="font-code text-xs text-white">PyTorch</span>
+              <span class="font-code text-xs text-signal">95%</span>
+            </div>
+            <div class="h-px bg-data/10 rounded overflow-hidden">
+              <div class="skill-bar-fill" data-width="0.95"></div>
+            </div>
+          </div>
+          <div class="skill-item">
+            <div class="flex justify-between mb-2">
+              <span class="font-code text-xs text-white">LangChain</span>
+              <span class="font-code text-xs text-signal">90%</span>
+            </div>
+            <div class="h-px bg-data/10 rounded overflow-hidden">
+              <div class="skill-bar-fill" data-width="0.90"></div>
+            </div>
+          </div>
+          <div class="skill-item">
+            <div class="flex justify-between mb-2">
+              <span class="font-code text-xs text-white">RAG Pipelines</span>
+              <span class="font-code text-xs text-signal">92%</span>
+            </div>
+            <div class="h-px bg-data/10 rounded overflow-hidden">
+              <div class="skill-bar-fill" data-width="0.92"></div>
+            </div>
+          </div>
+          <div class="skill-item">
+            <div class="flex justify-between mb-2">
+              <span class="font-code text-xs text-white">Transformers / HuggingFace</span>
+              <span class="font-code text-xs text-signal">85%</span>
+            </div>
+            <div class="h-px bg-data/10 rounded overflow-hidden">
+              <div class="skill-bar-fill" data-width="0.85"></div>
+            </div>
+          </div>
+          <div class="skill-item">
+            <div class="flex justify-between mb-2">
+              <span class="font-code text-xs text-white">FAISS / Vector DB</span>
+              <span class="font-code text-xs text-signal">88%</span>
+            </div>
+            <div class="h-px bg-data/10 rounded overflow-hidden">
+              <div class="skill-bar-fill" data-width="0.88"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Backend -->
+      <div class="glass rounded-2xl p-6" style="border-color:rgba(123,97,255,0.12);">
+        <div class="font-code text-xs tracking-widest uppercase mb-6" style="color:#b8a9ff;">Backend / APIs</div>
+        <div class="space-y-4">
+          <div class="skill-item">
+            <div class="flex justify-between mb-2">
+              <span class="font-code text-xs text-white">FastAPI</span>
+              <span class="font-code text-xs" style="color:#b8a9ff;">92%</span>
+            </div>
+            <div class="h-px bg-data/10 rounded overflow-hidden">
+              <div class="skill-bar-fill" data-width="0.92" style="background:linear-gradient(90deg,#7b61ff,#b8a9ff);"></div>
+            </div>
+          </div>
+          <div class="skill-item">
+            <div class="flex justify-between mb-2">
+              <span class="font-code text-xs text-white">Python</span>
+              <span class="font-code text-xs" style="color:#b8a9ff;">96%</span>
+            </div>
+            <div class="h-px bg-data/10 rounded overflow-hidden">
+              <div class="skill-bar-fill" data-width="0.96" style="background:linear-gradient(90deg,#7b61ff,#b8a9ff);"></div>
+            </div>
+          </div>
+          <div class="skill-item">
+            <div class="flex justify-between mb-2">
+              <span class="font-code text-xs text-white">Java</span>
+              <span class="font-code text-xs" style="color:#b8a9ff;">80%</span>
+            </div>
+            <div class="h-px bg-data/10 rounded overflow-hidden">
+              <div class="skill-bar-fill" data-width="0.80" style="background:linear-gradient(90deg,#7b61ff,#b8a9ff);"></div>
+            </div>
+          </div>
+          <div class="skill-item">
+            <div class="flex justify-between mb-2">
+              <span class="font-code text-xs text-white">SQL / PostgreSQL</span>
+              <span class="font-code text-xs" style="color:#b8a9ff;">82%</span>
+            </div>
+            <div class="h-px bg-data/10 rounded overflow-hidden">
+              <div class="skill-bar-fill" data-width="0.82" style="background:linear-gradient(90deg,#7b61ff,#b8a9ff);"></div>
+            </div>
+          </div>
+          <div class="skill-item">
+            <div class="flex justify-between mb-2">
+              <span class="font-code text-xs text-white">REST APIs</span>
+              <span class="font-code text-xs" style="color:#b8a9ff;">90%</span>
+            </div>
+            <div class="h-px bg-data/10 rounded overflow-hidden">
+              <div class="skill-bar-fill" data-width="0.90" style="background:linear-gradient(90deg,#7b61ff,#b8a9ff);"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Frontend + Cloud -->
+      <div class="glass rounded-2xl p-6" style="border-color:rgba(255,107,53,0.12);">
+        <div class="font-code text-xs tracking-widest uppercase mb-6" style="color:#ff9c78;">Frontend & Cloud</div>
+        <div class="space-y-4">
+          <div class="skill-item">
+            <div class="flex justify-between mb-2">
+              <span class="font-code text-xs text-white">React.js</span>
+              <span class="font-code text-xs" style="color:#ff9c78;">85%</span>
+            </div>
+            <div class="h-px bg-data/10 rounded overflow-hidden">
+              <div class="skill-bar-fill" data-width="0.85" style="background:linear-gradient(90deg,#ff6b35,#ff9c78);"></div>
+            </div>
+          </div>
+          <div class="skill-item">
+            <div class="flex justify-between mb-2">
+              <span class="font-code text-xs text-white">AWS (Cloud Practitioner)</span>
+              <span class="font-code text-xs" style="color:#ff9c78;">80%</span>
+            </div>
+            <div class="h-px bg-data/10 rounded overflow-hidden">
+              <div class="skill-bar-fill" data-width="0.80" style="background:linear-gradient(90deg,#ff6b35,#ff9c78);"></div>
+            </div>
+          </div>
+          <div class="skill-item">
+            <div class="flex justify-between mb-2">
+              <span class="font-code text-xs text-white">Docker</span>
+              <span class="font-code text-xs" style="color:#ff9c78;">75%</span>
+            </div>
+            <div class="h-px bg-data/10 rounded overflow-hidden">
+              <div class="skill-bar-fill" data-width="0.75" style="background:linear-gradient(90deg,#ff6b35,#ff9c78);"></div>
+            </div>
+          </div>
+          <div class="skill-item">
+            <div class="flex justify-between mb-2">
+              <span class="font-code text-xs text-white">Git / GitHub</span>
+              <span class="font-code text-xs" style="color:#ff9c78;">90%</span>
+            </div>
+            <div class="h-px bg-data/10 rounded overflow-hidden">
+              <div class="skill-bar-fill" data-width="0.90" style="background:linear-gradient(90deg,#ff6b35,#ff9c78);"></div>
+            </div>
+          </div>
+          <div class="skill-item">
+            <div class="flex justify-between mb-2">
+              <span class="font-code text-xs text-white">Tailwind / HTML/CSS</span>
+              <span class="font-code text-xs" style="color:#ff9c78;">88%</span>
+            </div>
+            <div class="h-px bg-data/10 rounded overflow-hidden">
+              <div class="skill-bar-fill" data-width="0.88" style="background:linear-gradient(90deg,#ff6b35,#ff9c78);"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tool chips -->
+    <div class="reveal mt-8 glass rounded-2xl p-6">
+      <div class="font-code text-xs text-data/40 tracking-widest uppercase mb-4">Also comfortable with</div>
+      <div class="flex flex-wrap gap-2">
+        <span class="tag tag-signal">Scikit-learn</span>
+        <span class="tag tag-signal">NumPy</span>
+        <span class="tag tag-signal">Pandas</span>
+        <span class="tag tag-pulse">OpenAI API</span>
+        <span class="tag tag-pulse">Anthropic API</span>
+        <span class="tag tag-pulse">Gemini API</span>
+        <span class="tag tag-ember">DenseNet</span>
+        <span class="tag tag-ember">Swin Transformer</span>
+        <span class="tag tag-ember">EfficientNet</span>
+        <span class="tag tag-signal">GAT</span>
+        <span class="tag tag-pulse">LaTeX</span>
+        <span class="tag tag-signal">Jupyter</span>
+        <span class="tag tag-ember">Matplotlib</span>
+        <span class="tag tag-pulse">Pinecone</span>
+        <span class="tag tag-signal">Chroma DB</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ─── RESEARCH ─── -->
+<section id="research" class="py-32 px-6 relative overflow-hidden">
+  <div class="absolute inset-0" style="background:radial-gradient(ellipse 80% 50% at 50% 50%,rgba(123,97,255,0.04),transparent);pointer-events:none;"></div>
+  <div class="max-w-6xl mx-auto relative z-10">
+    <div class="reveal text-center mb-16">
+      <div class="font-code text-xs text-signal tracking-widest uppercase mb-3">// 004 · Research</div>
+      <h2 class="font-display font-800 text-4xl md:text-5xl text-white">
+        Academic <span class="shimmer-text">Work</span>
+      </h2>
+    </div>
+
+    <div class="reveal space-y-6">
+      <!-- Paper 1 -->
+      <div class="glass rounded-2xl p-8 group" style="border-color:rgba(0,245,212,0.1);">
+        <div class="flex flex-col md:flex-row md:items-start gap-6">
+          <div class="flex-shrink-0 w-16 h-16 rounded-2xl flex items-center justify-center" style="background:linear-gradient(135deg,rgba(0,245,212,0.15),rgba(0,245,212,0.03));border:1px solid rgba(0,245,212,0.2);">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" stroke="#00f5d4" stroke-width="1.5"/><circle cx="12" cy="12" r="3" stroke="#00f5d4" stroke-width="1.5"/></svg>
+          </div>
+          <div class="flex-1">
+            <div class="flex items-center gap-3 mb-3">
+              <span class="tag tag-signal">Under Review</span>
+              <span class="tag tag-ember">ICONDEEPCOM 2026</span>
+              <span class="tag tag-pulse">Medical Imaging</span>
+            </div>
+            <h3 class="font-display font-700 text-white text-lg mb-3 leading-snug">
+              Retinal OCT Image Classification using DenseNet + Swin Transformer Hybrid Architecture
+            </h3>
+            <p class="font-code text-xs text-data/60 leading-relaxed mb-4">
+              Co-authored paper proposing a novel hybrid architecture combining DenseNet's dense connectivity with Swin Transformer's hierarchical attention for retinal OCT classification. Targets improved diagnostic accuracy for ophthalmological diseases through complementary feature extraction strategies.
+            </p>
+            <div class="flex items-center gap-4">
+              <div class="font-code text-xs text-data/40">SRMIST · 2025</div>
+              <div class="w-px h-3 bg-data/20"></div>
+              <div class="font-code text-xs text-data/40">Co-Author</div>
+              <div class="w-px h-3 bg-data/20"></div>
+              <div class="font-code text-xs text-data/40">Springer LNCS Format</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Paper 2 -->
+      <div class="glass rounded-2xl p-8 group" style="border-color:rgba(123,97,255,0.1);">
+        <div class="flex flex-col md:flex-row md:items-start gap-6">
+          <div class="flex-shrink-0 w-16 h-16 rounded-2xl flex items-center justify-center" style="background:linear-gradient(135deg,rgba(123,97,255,0.15),rgba(123,97,255,0.03));border:1px solid rgba(123,97,255,0.2);">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" stroke="#b8a9ff" stroke-width="1.5"/><polyline points="9,22 9,12 15,12 15,22" stroke="#b8a9ff" stroke-width="1.5"/></svg>
+          </div>
+          <div class="flex-1">
+            <div class="flex items-center gap-3 mb-3">
+              <span class="tag tag-pulse">In Progress</span>
+              <span class="tag tag-signal">Remote Sensing</span>
+              <span class="tag tag-ember">Graph Attention</span>
+            </div>
+            <h3 class="font-display font-700 text-white text-lg mb-3 leading-snug">
+              Remote Sensing Image Classification via EfficientNet-B0 and Graph Attention Networks (GAT)
+            </h3>
+            <p class="font-code text-xs text-data/60 leading-relaxed mb-4">
+              Research on a hybrid CNN-Transformer and Graph Attention Network system for satellite and aerial image classification. EfficientNet-B0 extracts local features while GAT models spatial relationships between regions for context-aware land-use classification.
+            </p>
+            <div class="flex items-center gap-4">
+              <div class="font-code text-xs text-data/40">SRMIST · 2025</div>
+              <div class="w-px h-3 bg-data/20"></div>
+              <div class="font-code text-xs text-data/40">Co-Author</div>
+              <div class="w-px h-3 bg-data/20"></div>
+              <div class="font-code text-xs text-data/40">LaTeX · IEEE Format</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ─── CONTACT ─── -->
+<section id="contact" class="py-32 px-6 relative">
+  <div class="max-w-3xl mx-auto text-center">
+    <div class="reveal">
+      <div class="font-code text-xs text-signal tracking-widest uppercase mb-3">// 005 · Contact</div>
+      <h2 class="font-display font-800 text-4xl md:text-6xl text-white leading-tight mb-6">
+        Let's Build<br/><span class="shimmer-text">Together</span>
+      </h2>
+      <p class="font-code text-sm text-data/60 max-w-xl mx-auto mb-12 leading-relaxed">
+        Open to AI/ML engineering internships, research collaborations, and full-stack development opportunities. Graduating May 2027.
+      </p>
+
+      <!-- Contact cards -->
+      <div class="grid sm:grid-cols-3 gap-4 mb-10">
+        <a href="mailto:narasimha@srmist.edu.in" class="glass rounded-xl p-5 group hover:border-signal/30 transition-all">
+          <div class="flex flex-col items-center gap-3">
+            <div class="w-10 h-10 rounded-lg flex items-center justify-center" style="background:rgba(0,245,212,0.1);border:1px solid rgba(0,245,212,0.2);">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" stroke="#00f5d4" stroke-width="1.5"/><polyline points="22,6 12,13 2,6" stroke="#00f5d4" stroke-width="1.5"/></svg>
+            </div>
+            <div>
+              <div class="font-code text-xs text-signal mb-0.5">Email</div>
+              <div class="font-code text-xs text-data/50 text-xs">Click to contact</div>
+            </div>
+          </div>
+        </a>
+
+        <a href="https://linkedin.com" target="_blank" class="glass rounded-xl p-5 group hover:border-pulse/30 transition-all" style="border-color:rgba(123,97,255,0.08);">
+          <div class="flex flex-col items-center gap-3">
+            <div class="w-10 h-10 rounded-lg flex items-center justify-center" style="background:rgba(123,97,255,0.1);border:1px solid rgba(123,97,255,0.2);">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z" stroke="#b8a9ff" stroke-width="1.5"/><rect x="2" y="9" width="4" height="12" stroke="#b8a9ff" stroke-width="1.5"/><circle cx="4" cy="4" r="2" stroke="#b8a9ff" stroke-width="1.5"/></svg>
+            </div>
+            <div>
+              <div class="font-code text-xs mb-0.5" style="color:#b8a9ff;">LinkedIn</div>
+              <div class="font-code text-xs text-data/50">Connect</div>
+            </div>
+          </div>
+        </a>
+
+        <a href="https://github.com" target="_blank" class="glass rounded-xl p-5 group hover:border-ember/30 transition-all" style="border-color:rgba(255,107,53,0.08);">
+          <div class="flex flex-col items-center gap-3">
+            <div class="w-10 h-10 rounded-lg flex items-center justify-center" style="background:rgba(255,107,53,0.1);border:1px solid rgba(255,107,53,0.2);">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22" stroke="#ff9c78" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </div>
+            <div>
+              <div class="font-code text-xs mb-0.5" style="color:#ff9c78;">GitHub</div>
+              <div class="font-code text-xs text-data/50">View Code</div>
+            </div>
+          </div>
+        </a>
+      </div>
+
+      <div class="terminal text-left max-w-lg mx-auto">
+        <div class="terminal-bar">
+          <div class="dot bg-red-500"></div>
+          <div class="dot bg-yellow-500"></div>
+          <div class="dot bg-green-500"></div>
+          <span class="font-code text-xs text-data/40 ml-2">opportunity.sh</span>
+        </div>
+        <div class="p-5 font-code text-xs leading-relaxed">
+          <div class="text-data/40 mb-1">$ ./check_availability.sh</div>
+          <div class="text-signal mb-1">✓ Available: Summer 2025 internships</div>
+          <div class="text-signal mb-1">✓ Open to: Remote / Hybrid / On-site</div>
+          <div class="text-signal mb-1">✓ Focus: AI/ML Engineering, LLMs, RAG</div>
+          <div class="text-data/50 mt-3">$ echo "Let's build something remarkable"</div>
+          <div class="text-white">Let's build something remarkable<span class="text-signal" style="animation:blink 1s step-end infinite;">_</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Footer -->
+<footer class="border-t py-8 px-6" style="border-color:rgba(0,245,212,0.06);">
+  <div class="max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
+    <div class="font-code text-xs text-data/30">
+      © 2025 Budde Narasimha Surya Teja · Built with precision
+    </div>
+    <div class="font-code text-xs text-data/30">
+      SRMIST · Kattankulatham · Chennai
+    </div>
+    <div class="font-code text-xs text-signal/40">
+      AI/ML Engineer · Expected Graduation May 2027
+    </div>
+  </div>
+</footer>
+
+<script>
+// ─── CURSOR ───
+const cursor = document.getElementById('cursor');
+const ring = document.getElementById('cursor-ring');
+let mx = 0, my = 0, rx = 0, ry = 0;
+
+document.addEventListener('mousemove', e => {
+  mx = e.clientX; my = e.clientY;
+  cursor.style.left = mx - 6 + 'px';
+  cursor.style.top = my - 6 + 'px';
+});
+
+function animRing() {
+  rx += (mx - rx) * 0.12;
+  ry += (my - ry) * 0.12;
+  ring.style.left = rx + 'px';
+  ring.style.top = ry + 'px';
+  requestAnimationFrame(animRing);
+}
+animRing();
+
+document.querySelectorAll('a, button').forEach(el => {
+  el.addEventListener('mouseenter', () => {
+    cursor.style.transform = 'scale(2.5)';
+    ring.style.width = '52px';
+    ring.style.height = '52px';
+    ring.style.borderColor = 'rgba(0,245,212,0.6)';
+  });
+  el.addEventListener('mouseleave', () => {
+    cursor.style.transform = 'scale(1)';
+    ring.style.width = '36px';
+    ring.style.height = '36px';
+    ring.style.borderColor = 'rgba(0,245,212,0.4)';
+  });
+});
+
+// ─── NEURAL CANVAS ───
+const canvas = document.getElementById('neural-canvas');
+const ctx = canvas.getContext('2d');
+let nodes = [];
+
+function resize() {
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+}
+resize();
+window.addEventListener('resize', () => { resize(); initNodes(); });
+
+function initNodes() {
+  nodes = [];
+  const count = Math.floor((canvas.width * canvas.height) / 18000);
+  for (let i = 0; i < count; i++) {
+    nodes.push({
+      x: Math.random() * canvas.width,
+      y: Math.random() * canvas.height,
+      vx: (Math.random() - 0.5) * 0.3,
+      vy: (Math.random() - 0.5) * 0.3,
+      r: Math.random() * 2 + 0.5,
+    });
+  }
+}
+initNodes();
+
+function drawNeural() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+  for (let i = 0; i < nodes.length; i++) {
+    const n = nodes[i];
+    n.x += n.vx; n.y += n.vy;
+    if (n.x < 0 || n.x > canvas.width) n.vx *= -1;
+    if (n.y < 0 || n.y > canvas.height) n.vy *= -1;
+
+    for (let j = i + 1; j < nodes.length; j++) {
+      const m = nodes[j];
+      const dx = n.x - m.x, dy = n.y - m.y;
+      const dist = Math.sqrt(dx*dx + dy*dy);
+      if (dist < 140) {
+        const alpha = (1 - dist/140) * 0.12;
+        ctx.strokeStyle = `rgba(0,245,212,${alpha})`;
+        ctx.lineWidth = 0.5;
+        ctx.beginPath();
+        ctx.moveTo(n.x, n.y);
+        ctx.lineTo(m.x, m.y);
+        ctx.stroke();
+      }
+    }
+
+    ctx.beginPath();
+    ctx.arc(n.x, n.y, n.r, 0, Math.PI * 2);
+    ctx.fillStyle = 'rgba(0,245,212,0.3)';
+    ctx.fill();
+  }
+  requestAnimationFrame(drawNeural);
+}
+drawNeural();
+
+// ─── SCROLL REVEAL ───
+const reveals = document.querySelectorAll('.reveal');
+const revealObs = new IntersectionObserver(entries => {
+  entries.forEach((entry, i) => {
+    if (entry.isIntersecting) {
+      setTimeout(() => entry.target.classList.add('visible'), i * 80);
+    }
+  });
+}, { threshold: 0.1 });
+reveals.forEach(el => revealObs.observe(el));
+
+// ─── SKILL BARS ───
+const skillObs = new IntersectionObserver(entries => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      entry.target.querySelectorAll('.skill-bar-fill').forEach(bar => {
+        const w = parseFloat(bar.dataset.width || bar.style.width);
+        bar.style.transform = `scaleX(${w || 0.8})`;
+      });
+    }
+  });
+}, { threshold: 0.3 });
+document.querySelectorAll('.glass').forEach(el => skillObs.observe(el));
+
+// ─── COUNTERS ───
+const counterObs = new IntersectionObserver(entries => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      const el = entry.target;
+      const target = parseInt(el.dataset.target);
+      let current = 0;
+      const step = target / 30;
+      const timer = setInterval(() => {
+        current += step;
+        if (current >= target) { el.textContent = target; clearInterval(timer); }
+        else el.textContent = Math.floor(current);
+      }, 40);
+      counterObs.unobserve(el);
+    }
+  });
+}, { threshold: 0.5 });
+document.querySelectorAll('.counter').forEach(el => counterObs.observe(el));
+
+// ─── NAV SCROLL ───
+window.addEventListener('scroll', () => {
+  const nav = document.querySelector('nav');
+  if (window.scrollY > 50) {
+    nav.style.padding = '0.75rem 2rem';
+    nav.style.borderBottomColor = 'rgba(0,245,212,0.08)';
+  } else {
+    nav.style.padding = '1.25rem 2rem';
+    nav.style.borderBottomColor = 'rgba(0,245,212,0.05)';
+  }
+});
+</script>
+</body>
+</html>
